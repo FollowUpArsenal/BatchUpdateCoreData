@@ -20,28 +20,27 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     }
 
     @IBAction func toggle(sender: AnyObject) {
-        let toggleButton = sender as UIBarButtonItem
-        println("sender title: \(toggleButton.title)")
+
         
         let batchRequest = NSBatchUpdateRequest(entityName: "Event")
         
-        if toggleButton.title == "Rocks" {
-            batchRequest.propertiesToUpdate = ["annotation" : "Devarshi Rocks"]
-            toggleButton.title = "Genius"
+        if toggleButton.title == "beautiful" {
+            batchRequest.propertiesToUpdate = ["annotation" : "Swift is beautiful"]
+            toggleButton.title = "awesome"
         }
         else
         {
-            batchRequest.propertiesToUpdate = ["annotation" : "Devarshi is Genius"]
-            toggleButton.title = "Rocks"
+            batchRequest.propertiesToUpdate = ["annotation" : "Swift is awesome"]
+            toggleButton.title = "beautiful"
         }
         
         batchRequest.resultType = .UpdatedObjectIDsResultType
         let appDelegate = UIApplication.sharedApplication().delegate as AppDelegate
-        let localManagedObjectContext = appDelegate.managedObjectContext!
+        let localManagedObjectContext = self.fetchedResultsController.managedObjectContext
         var  results = localManagedObjectContext.executeRequest(batchRequest, error: nil) as NSBatchUpdateResult
         var objectIds = results.result as NSArray
         
-        println("results: \(objectIds)")
+        println("results obtained")
         
         // refreshing updated objects
         for objectId in objectIds {
@@ -54,16 +53,15 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
             }
         }
         
+        println("all objects refereshed")
+        self.fetchedResultsController.performFetch(nil)
+        println("fetch performed")
     }
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        self.navigationItem.leftBarButtonItem = self.editButtonItem()
-        self.toggleButton.title = "Rocks"
-        /*
-        let addButton = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "insertNewObject:")
-        self.navigationItem.rightBarButtonItem = addButton
-*/
+        // self.navigationItem.leftBarButtonItem = self.editButtonItem()
+        self.toggleButton.title = "awesome"
     }
 
     override func didReceiveMemoryWarning() {
@@ -141,8 +139,9 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     }
 
     func configureCell(cell: UITableViewCell, atIndexPath indexPath: NSIndexPath) {
-        let object = self.fetchedResultsController.objectAtIndexPath(indexPath) as NSManagedObject
-        cell.textLabel?.text = object.valueForKey("annotation")!.description
+        let event = self.fetchedResultsController.objectAtIndexPath(indexPath) as Event
+        println("event.annotation \(event.annotation)")
+        cell.textLabel?.text = event.annotation
     }
 
     // MARK: - Fetched results controller
@@ -206,7 +205,9 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
             case .Delete:
                 tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
             case .Update:
-                self.configureCell(tableView.cellForRowAtIndexPath(indexPath)!, atIndexPath: indexPath)
+                if let cell = tableView.cellForRowAtIndexPath(indexPath) {
+                    self.configureCell(cell, atIndexPath: indexPath)
+                }
             case .Move:
                 tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
                 tableView.insertRowsAtIndexPaths([newIndexPath], withRowAnimation: .Fade)

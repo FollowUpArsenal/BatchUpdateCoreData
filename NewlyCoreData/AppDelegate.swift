@@ -14,7 +14,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     
-    let maxInsertionCount = 5000
+    let maxInsertionCount = 50000
 
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
@@ -26,7 +26,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if !ifRecordsAlreadyExist() {
             // record does not exist :-)
             // hence insert
-            self.insertData(times: maxInsertionCount, myKeyword: "Devarshi is Genius")
+            self.insertData(times: maxInsertionCount, myKeyword:"Swift is beautiful")
         }
         
         return true
